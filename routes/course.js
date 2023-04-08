@@ -6,6 +6,11 @@ let mongoClient = require("mongodb").MongoClient;
 let url ="mongodb://localhost:27017";
 const dbName = 'ARHAMDB';
 const collectionName = 'COURSE';
+const multer=require('multer')
+const imageUpload=multer({
+    dest:'public/images',
+})
+
 
 /*
        Rest api / crud (create ,read ,update ,delete) operation /
@@ -46,14 +51,14 @@ router.get('/', function(req, res, next) {
 });
 
 /* create new course row in collection */
-router.post('/', function(req, res, next) {
+router.post('/', imageUpload.single('image'), function(req, res, next) {
     // res.send('course router post methods response.');
 
     mongoClient.connect(url,(err,client)=> {
         if(!err){
             console.log("Connected")
             let db = client.db(dbName);
-
+            req.body["file"]=req.file;
             db.collection(collectionName).insertOne(req.body,(err,result)=> {
                 if(!err){
                     console.log("Record inserted successfully")
