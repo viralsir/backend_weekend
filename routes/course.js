@@ -51,6 +51,7 @@ router.get('/', function(req, res, next) {
 });
 
 /* create new course row in collection */
+/*
 router.post('/', imageUpload.single('image'), function(req, res, next) {
     // res.send('course router post methods response.');
 
@@ -79,6 +80,44 @@ router.post('/', imageUpload.single('image'), function(req, res, next) {
 
 
 });
+*/
+
+
+
+router.post('/',function(req, res, next) {
+    // res.send('course router post methods response.');
+   console.log("inside post");
+    mongoClient.connect(url,(err,client)=> {
+        if(!err){
+            console.log("Connected")
+            let db = client.db(dbName);
+            //req.body["file"]=req.file;
+            db.collection(collectionName).insertOne(req.body,(err,result)=> {
+                if(!err){
+                    console.log("Record inserted successfully")
+                    res.send("record inserted successfully");
+                    //console.log(result);
+                }else {
+                    console.log(err);
+                    res.send("error in inserting records");
+                }
+                client.close();
+            })
+        }else {
+            console.log(err);
+            res.send("error in conneting database")
+        }
+
+    })
+
+
+});
+
+
+
+
+
+
 
 /*
     update record from collection
@@ -92,20 +131,20 @@ router.put('/', function(req, res, next) {
             console.log("Connected")
             let db = client.db(dbName);
 
-            db.collection(collectionName).replaceOne({"_id":req.body._id},req.body,(err,result)=> {
+            db.collection(collectionName).replaceOne({"id":req.body.id},req.body,(err,result)=> {
                 if(!err){
                     console.log("Record inserted successfully")
-                    res.send("record inserted successfully");
+                    res.send("record updated successfully");
                     //console.log(result);
                 }else {
                     console.log(err);
-                    res.send("error in inserting records");
+                    res.send("error in updating  records");
                 }
                 client.close();
             })
         }else {
             console.log(err);
-            res.send("error in inserting records")
+            res.send("error in updating records")
         }
 
     })
@@ -114,14 +153,15 @@ router.put('/', function(req, res, next) {
 /*
     delete the record
  */
-router.delete('/', function(req, res, next) {
+router.delete('/:id', function(req, res, next) {
     //res.send('course router delete methods response.');
     mongoClient.connect(url,(err,client)=> {
         if(!err){
             console.log("Connected")
             let db = client.db(dbName);
-
-            db.collection(collectionName).deleteOne({"_id":req.body._id},req.body,(err,result)=> {
+            console.log(req.body);
+            console.log(req.params.id)
+            db.collection(collectionName).deleteOne({"id":parseInt(req.params.id)},(err,result)=> {
                 if(result.deletedCount>0){
                     res.send("Record deleted successfully")
                 }else {
@@ -138,12 +178,6 @@ router.delete('/', function(req, res, next) {
 
 
 });
-
-
-
-
-
-
 
 
 
